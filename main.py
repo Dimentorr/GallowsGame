@@ -1,13 +1,14 @@
 import sys
 from PyQt5.QtWidgets import QWidget, QApplication
 from PyQt5.QtGui import QPainter, QColor, QFont
-from PyQt5.QtCore import Qt, QLine, QRect
+from PyQt5.QtCore import Qt, QLine, QRect, QPoint, QSize
 import random
 
 
 class Example(QWidget):
     def __init__(self):
         super().__init__()
+        self.rects_for_letters = list()
         self.words = ['ромашка', 'солнце', 'собака']
         self.hints = ['На любовь гадают обычно именно так',
                       'В начале оно вращалось вокруг, а потом оказалось, что всё иначе', 'Друг человека']
@@ -18,33 +19,6 @@ class Example(QWidget):
 
         self.initUI(self.dict_words[self.new_word])
 
-    def draw_first_line(self, qp):
-        qp.drawLine(290, 40, 290, 150)
-
-    def draw_second_line(self, qp):
-        qp.drawLine(310, 60, 220, 60)
-
-    def draw_third_line(self, qp):
-        qp.drawLine(220, 60, 220, 85)
-
-    def draw_head(self, qp):
-        qp.drawEllipse(213, 85, 15, 15)
-
-    def draw_body(self, qp):
-        qp.drawLine(220, 100, 220, 130)
-
-    def draw_first_hand(self, qp):
-        qp.drawLine(220, 105, 230, 115)
-
-    def draw_second_hand(self, qp):
-        qp.drawLine(220, 105, 210, 115)
-
-    def draw_first_leg(self, qp):
-        qp.drawLine(220, 130, 210, 140)
-
-    def draw_second_leg(self, qp):
-        qp.drawLine(220, 130, 230, 140)
-
     def initUI(self, text):
         self.text = text
         self.setGeometry(500, 300, 480, 370)
@@ -54,26 +28,41 @@ class Example(QWidget):
     def paintEvent(self, event):
         qp = QPainter()
         qp.begin(self)
-        self.drawText(event, qp)
+        self.drawText(event, qp, self.text)
         self.drawMan(qp)
         qp.end()
 
     def drawMan(self, qp):
-        qp.setPen(QColor(1, 1, 1))
-        self.draw_first_line(qp)
-        self.draw_second_line(qp)
-        self.draw_third_line(qp)
-        self.draw_head(qp)
-        self.draw_body(qp)
-        self.draw_first_hand(qp)
-        self.draw_second_hand(qp)
-        self.draw_first_leg(qp)
-        self.draw_second_leg(qp)
+        # убрать все фекции, на отрисовку сделал хуйню...
+        qp.setPen(QColor(192, 50, 153))
+        qp.drawLine(10, 200, 470, 200)
+        qp.drawLine(10, 230, 470, 230)
+        x, y = (self.width() // 2 - (23 * len(self.new_word)) // 2), 205
+        for i in range(len(self.new_word)):
+            rect = QRect(QPoint(x + (i * 23), y), QSize(20, 20))
+            qp.drawRect(x + (i * 23), y, 20, 20)
+            self.rects_for_letters.append(rect)
+            print(1)
+            print(type(self.rects_for_letters[i]))
+            print(1)
+            qp.drawText(self.rects_for_letters[i], Qt.AlignCenter, self.new_word[i])
+            print(1)
 
-    def drawText(self, event, qp):
+        qp.setPen(QColor(1, 1, 1))
+        self.first_line = qp.drawLine(290, 40, 290, 150)
+        self.second_line = qp.drawLine(310, 60, 220, 60)
+        self.third_line = qp.drawLine(220, 60, 220, 85)
+        self.head = qp.drawEllipse(213, 85, 15, 15)
+        self.body = qp.drawLine(220, 100, 220, 130)
+        self.first_hand = qp.drawLine(220, 105, 230, 115)
+        self.second_hand = qp.drawLine(220, 105, 210, 115)
+        self.first_leg = qp.drawLine(220, 130, 210, 140)
+        self.second_leg = qp.drawLine(220, 130, 230, 140)
+
+    def drawText(self, event, qp, text):
         qp.setPen(QColor(1, 1, 1))
         qp.setFont(QFont('Decorative', 10))
-        qp.drawText(event.rect(), Qt.AlignTop, self.text)
+        qp.drawText(event.rect(), Qt.AlignTop, text)
 
 
 if __name__ == '__main__':
